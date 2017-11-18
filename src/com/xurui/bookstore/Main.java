@@ -1,6 +1,12 @@
+/*
 package com.xurui;
 
+import BookDefinitionEntity;
+import BookInstanceEntity;
+
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -55,12 +61,11 @@ public class Main {
         System.out.println(" 0：退出");
     }
 
-    private static BookDefinition searchBooks(boolean prtTitle) {
+    private static BookDefinitionEntity searchBooks(boolean prtTitle) {
         if (prtTitle) {
             System.out.println("=======================查找书籍=======================");
         }
-        BookDefinition[] searchResults;
-        BookDefinition result = null;
+        List<BookDefinitionEntity> searchResults;
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String inputStr;
         try {
@@ -68,20 +73,19 @@ public class Main {
                 System.out.println("请输入查询条件：“书名 作者 出版社 版本”");
                 inputStr = reader.readLine();
                 searchResults = bookStore.searchBooks(inputStr.trim().split("\\s+"));
-                if (searchResults == null) {
+                if (searchResults == null || searchResults.isEmpty()) {
                     System.out.println("未查询到符合条件的书籍，是否继续查找？（Y/N）");
                 } else {
                     break;
                 }
             } while (reader.readLine().trim().equalsIgnoreCase("Y"));
-            if (searchResults != null) {
-                for (int i = 0; i < searchResults.length && searchResults[i] != null; i++) {
-                    searchResults[i].displayInfo();
+            if (searchResults != null && !searchResults.isEmpty()) {
+                for (int i = 0; i < searchResults.size(); i++) {
+                    searchResults.get(i).displayInfo();
                     System.out.println("是您要查找的书籍（Y/N)？");
                     if (reader.readLine().trim().equals("Y")) {
-                        result = searchResults[i];
-                        break;
-                    } else if (i == searchResults.length - 1 || searchResults[i + 1] == null) {
+                        return searchResults.get(i);
+                    } else if (i == searchResults.size() - 1) {
                         System.out.println("已到达最后一条结果，是否重新查看查询结果？（Y/N)");
                         if (reader.readLine().trim().equals("Y")) {
                             i = -1;
@@ -93,7 +97,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        return result;
+        return null;
     }
 
     private static void defineBooks() {
@@ -119,53 +123,29 @@ public class Main {
         System.out.println("=======================书籍入库=======================");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String inputStr;
-        BookDefinition bd;
-        int inboundBookCount;
+        BookDefinitionEntity bd;
         try {
-            int availInboundNum = bookStore.getAvailInboundNum();
-            if (availInboundNum <= 0) {
-                System.out.println("书库已满，无法继续入库");
-                return;
-            }
-
-            System.out.println("还可以入库" + availInboundNum + "本书籍。");
-            System.out.println("是否继续入库？（Y/N）");
-            if (reader.readLine().trim().equals("N")) {
-                return;
-            }
-
-            BookInstance[] books = new BookInstance[availInboundNum];
+            List<BookInstanceEntity> books = new LinkedList<>();
             do {
-                inboundBookCount = 0;
                 bd = searchBooks(false);
                 if (bd != null) {
                     do {
                         System.out.println("请输入书籍的二维码：");
                         if (!(inputStr = reader.readLine()).trim().isEmpty()) {
-                            books[inboundBookCount++] = new BookInstance(bd.getDefinitionId(), inputStr);
-                            availInboundNum--;
+                            books.add(new BookInstanceEntity(bd.getDefinitionId(), inputStr));
                         } else {
                             System.out.println("请输入正确的书籍二维码。");
                         }
 
-                        if (availInboundNum == 0) {
-                            System.out.println("要入库的书籍数量已达到书库最大值，结束二维码录入。");
-                            break;
-                        } else {
-                            System.out.println("二维码录入完毕？（Y/N)");
-                        }
+                        System.out.println("二维码录入完毕？（Y/N)");
                     } while (reader.readLine().trim().equals("N"));
 
-                    if (inboundBookCount != 0) {
-                        bookStore.inbound(books, inboundBookCount);
+                    if(!books.isEmpty()) {
+                        bookStore.inbound(books, bd);
                     }
                 }
 
-                if (availInboundNum == 0) {
-                    break;
-                } else {
-                    System.out.println("继续录入其他种类书籍？（Y/N）");
-                }
+                System.out.println("继续录入其他种类书籍？（Y/N）");
             } while (reader.readLine().trim().equals("Y"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -271,3 +251,4 @@ public class Main {
 
     private static BookStore bookStore;
 }
+*/
